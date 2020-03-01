@@ -4,15 +4,13 @@ from decouple import config
 API_KEY = config('API_KEY')
 BACKEND = config('BACKEND')
 
-headers = {
-  "Authorization": f"Token {API_KEY}"
-}
+headers = { "Authorization": f"Token {API_KEY}" }
 
 def check_json(response):
     try:
         return response.json()
     except ValueError:
-        print("Error:  Non-json response")
+        print("Error: Non-JSON response")
         print("Response returned:")
         print(response)
         return None
@@ -43,6 +41,8 @@ def adv_init():
     r = requests.get(endpoint, headers=headers)
     data = check_json(r)
 
+    return data
+
 
 def adv_status():
     """ 
@@ -52,6 +52,8 @@ def adv_status():
 
     r = requests.post(endpoint, headers=headers)
     data = check_json(r)
+
+    return data
 
 
 def adv_change_name(name):
@@ -64,6 +66,8 @@ def adv_change_name(name):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_pray():
     """ 
@@ -73,6 +77,8 @@ def adv_pray():
 
     r = requests.post(endpoint, headers=headers)
     data = check_json(r)
+
+    return data
 
 
 #-----------------------------------------
@@ -92,6 +98,8 @@ def adv_move(direction, next_room_id=None):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_fly(direction, next_room_id=None):
     """ 
@@ -104,6 +112,8 @@ def adv_fly(direction, next_room_id=None):
     
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
+
+    return data
 
 
 def adv_dash(direction, num_rooms, next_room_ids):
@@ -120,6 +130,8 @@ def adv_dash(direction, num_rooms, next_room_ids):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_warp():
     """ 
@@ -130,6 +142,8 @@ def adv_warp():
     r = requests.post(endpoint, headers=headers)
     data = check_json(r)
 
+    return data
+
 
 def adv_recall():
     """ 
@@ -139,6 +153,8 @@ def adv_recall():
 
     r = requests.post(endpoint, headers=headers)
     data = check_json(r)
+
+    return data
 
 
 #-----------------------------------------
@@ -156,6 +172,8 @@ def adv_examine(name):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_take(name):
     """ 
@@ -167,6 +185,8 @@ def adv_take(name):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_drop(name):
     """ 
@@ -177,6 +197,8 @@ def adv_drop(name):
 
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
+
+    return data
 
 
 def adv_sell(name, confirm=False):
@@ -191,6 +213,8 @@ def adv_sell(name, confirm=False):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_transmogrify(name):
     """ 
@@ -201,6 +225,8 @@ def adv_transmogrify(name):
     
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
+
+    return data
 
 
 def adv_wear(name):
@@ -213,6 +239,8 @@ def adv_wear(name):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_undress(name):
     """ 
@@ -223,6 +251,8 @@ def adv_undress(name):
 
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
+
+    return data
 
 
 def adv_carry(name):
@@ -235,6 +265,8 @@ def adv_carry(name):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def adv_receive(name):
     """ 
@@ -245,6 +277,8 @@ def adv_receive(name):
 
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
+
+    return data
 
 
 #==========================================
@@ -269,6 +303,8 @@ def bc_mine(proof):
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 
+    return data
+
 
 def bc_last_proof():
     """ 
@@ -279,12 +315,16 @@ def bc_last_proof():
     r = requests.get(endpoint, headers=headers)
     data = check_json(r)
 
+    return data
+
 
 def bc_get_balance():
     """ 
     GET request to api/bc/get_balance
     """
     endpoint = req_bc("get_balance/")
-    
+
     r = requests.get(endpoint, headers=headers)
     data = check_json(r)
+
+    return data
