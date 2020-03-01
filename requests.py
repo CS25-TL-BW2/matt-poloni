@@ -27,124 +27,124 @@ def init():
     endpoint = req_adv("init/")
     r = requests.get(endpoint, headers=headers)
 
-def move():
+def move(payload):
     """ 
     POST request to api/adv/move
     """
     endpoint = req_adv("move/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def take():
+def take(payload):
     """ 
     POST request to api/adv/take
     """
     endpoint = req_adv("take/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def drop():
+def drop(payload):
     """ 
     POST request to api/adv/drop
     """
     endpoint = req_adv("drop/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def sell():
+def sell(payload):
     """ 
     POST request to api/adv/sell
     """
     endpoint = req_adv("sell/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def status():
+def status(payload):
     """ 
     POST request to api/adv/status
     """
     endpoint = req_adv("status/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def examine():
+def examine(payload):
     """ 
     POST request to api/adv/examine
     """
     endpoint = req_adv("examine/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def wear():
+def wear(payload):
     """ 
     POST request to api/adv/wear
     """
     endpoint = req_adv("wear/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def undress():
+def undress(payload):
     """ 
     POST request to api/adv/undress
     """
     endpoint = req_adv("undress/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def change_name():
+def change_name(payload):
     """ 
     POST request to api/adv/change_name
     """
     endpoint = req_adv("change_name/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def pray():
+def pray(payload):
     """ 
     POST request to api/adv/pray
     """
     endpoint = req_adv("pray/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def fly():
+def fly(payload):
     """ 
     POST request to api/adv/fly
     """
     endpoint = req_adv("fly/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def dash():
+def dash(payload):
     """ 
     POST request to api/adv/dash
     """
     endpoint = req_adv("dash/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def carry():
+def carry(payload):
     """ 
     POST request to api/adv/carry
     """
     endpoint = req_adv("carry/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def receive():
+def receive(payload):
     """ 
     POST request to api/adv/receive
     """
     endpoint = req_adv("receive/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def warp():
+def warp(payload):
     """ 
     POST request to api/adv/warp
     """
     endpoint = req_adv("warp/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def recall():
+def recall(payload):
     """ 
     POST request to api/adv/recall
     """
     endpoint = req_adv("recall/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
-def transmogrify():
+def transmogrify(payload):
     """ 
     POST request to api/adv/transmogrify
     """
     endpoint = req_adv("transmogrify/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
 #==========================================
 # Blockchain Endpoints
@@ -158,12 +158,12 @@ def req_bc(endpoint):
 
 #------------------------------------------
 
-def mine():
+def mine(payload):
     """ 
     POST request to api/bc/mine
     """
     endpoint = req_bc("mine/")
-    r = requests.post(endpoint, headers=headers, json=data)
+    r = requests.post(endpoint, headers=headers, json=payload)
 
 def last_proof():
     """ 
@@ -178,4 +178,3 @@ def get_balance():
     """
     endpoint = req_bc("get_balance/")
     r = requests.get(endpoint, headers=headers)
-    
