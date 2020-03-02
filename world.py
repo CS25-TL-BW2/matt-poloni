@@ -36,7 +36,9 @@ class World:
             room = room_graph[coords]
             print(room["exits"])
             for direction in room["exits"]:
-                dict_room.connect_rooms(direction, self.rooms[room["exits"][direction]])
+                dir_exit = room["exits"][direction]
+                if dir_exit in self.rooms:
+                    dict_room.connect_rooms(direction, self.rooms[dir_exit])
 
     def add_room(self, room):
         pass
@@ -81,7 +83,7 @@ class World:
                 else:
                     str += " "
                 if room is not None:
-                    str += f"{room.id}".zfill(3)
+                    str += f"{room.room_id}".zfill(3)
                 else:
                     str += "   "
                 if room is not None and room.e is not None:
