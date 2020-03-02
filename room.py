@@ -14,6 +14,7 @@ class Room:
     def __repr__(self):
         dirs = ['n', 's', 'e', 'w']
         result = {
+            "room_id": self.room_id,
             "title": self.title,
             "description": self.description,
             "coordinates": self.get_coords(),
