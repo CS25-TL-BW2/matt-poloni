@@ -11,6 +11,10 @@ class World:
         self.rooms = {}
         self.room_grid = []
         self.grid_size = 0
+
+        main_map_file = "data/main_world.txt"
+        main_map = file_io.read(main_map_file)
+        self.load_graph(main_map)
     
     def __repr__(self):
         return str(self.rooms)

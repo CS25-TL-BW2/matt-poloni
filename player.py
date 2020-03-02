@@ -7,8 +7,6 @@ class Player:
     def __init__(self, current_room, cache=None, main_world=None, dark_world=None):
         self.name = name
         self.cooldown_end = cooldown_end
-        self.last_errors = last_errors
-        self.last_messages = last_messages
         self.encumbrance = encumberance
         self.strength = strength
         self.speed = speed
@@ -16,12 +14,13 @@ class Player:
         self.bodywear = bodywear
         self.footwear = footwear
         self.inventory = inventory
-        self.has_mined_coin = has_mined_coin
+        self.abilities = abilities
+        self.status = status
+        self.has_mined = has_mined
+        self.last_errors = last_errors
+        self.last_messages = last_messages
+        
         self.current_room = current_room
-        self.can_fly = can_fly
-        self.can_dash = can_dash
-        self.can_warp = can_warp
-        self.can_recall = can_recall
         self.shop_room = shop_room
         self.mining_room = mining_room
         self.is_renamed = is_renamed
