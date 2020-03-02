@@ -1,51 +1,80 @@
-from world import World
 from time import time
+from pprint import pprint
 from collections import deque
+from ast import literal_eval
+
+from world import World
 from endpoints import *
+import file_io
 
 class Player:
-    def __init__(self, current_room, cache=None, main_world=None, dark_world=None):
-        self.name = name
-        self.cooldown_end = cooldown_end
-        self.encumbrance = encumberance
-        self.strength = strength
-        self.speed = speed
-        self.gold = gold
-        self.bodywear = bodywear
-        self.footwear = footwear
-        self.inventory = inventory
-        self.abilities = abilities
-        self.status = status
-        self.has_mined = has_mined
-        self.last_errors = last_errors
-        self.last_messages = last_messages
-        
-        self.current_room = current_room
-        self.shop_room = shop_room
-        self.mining_room = mining_room
-        self.is_renamed = is_renamed
+    def __init__(self, cache="data/player.txt"):
+        main_world_file = "data/main_world.txt"
+        self.main_world = World("main", main_world_file)
+        self.unvisited_main = set()
+
+        dark_world_file = "data/dark_world.txt"
+        self.dark_world = World("dark", dark_world_file)
+        self.unvisited_dark = set()
+
+        prop_check = lambda n, v=None: v if n not in cache else cache[n]
+
+        self.name = prop_check("name")
+        self.cooldown_end = prop_check("cooldown_end")
+        self.encumbrance = prop_check("encumbrance")
+        self.strength = prop_check("strength")
+        self.speed = prop_check("speed")
+        self.gold = prop_check("gold")
+        self.bodywear = prop_check("bodywear")
+        self.footwear = prop_check("footwear")
+        self.inventory = prop_check("inventory")
+        self.abilities = prop_check("abilities")
+        self.status = prop_check("status")
+        self.has_mined = prop_check("has_mined")
+        self.last_errors = prop_check("last_errors")
+        self.last_messages = prop_check("last_messages")
+
+        self.current_world = self.dark_world if prop_check("current_world") == "dark" else self.main_world
+        self.current_room = prop_check("current_room")
+        self.unvisited_main = prop_check("unvisited_main")
+        self.unvisited_dark = prop_check("unvisited_dark")
+        self.current_unvisited = self.unvisited_dark if prop_check("current_world") == "dark" else self.unvisited_main
+        self.shop_room = prop_check("shop_room")
+        self.mining_room = prop_check("mining_room")
+        self.is_renamed = prop_check("is_renamed")
         # -------
+        # self.current_room = current_room
+        # self.num_rooms = 500
+        # self.visited_rooms = {}
+        # self.add_room_to_visited(current_room)
 
-
-
-
-        self.current_room = current_room
-        self.num_rooms = 500
-        self.unvisited_coords = set()
-        self.visited_rooms = {}
-        self.add_room_to_visited(current_room)
-
-        self.cooldown_end = time()
+        # self.cooldown_end = time()
     
     def __repr__(self):
-        return {
-            "name": self.name,
-            "cooldown_end": self.cooldown_end,
-            "last_errors": self.last_errors,
-            "last_messages": self.last_messages,
-            "encumberance": self.encumbrance,
-            "strength": self.strength,
+        result = {
+          "name": self.name,
+          "cooldown_end": self.cooldown_end,
+          "encumbrance": self.encumbrance,
+          "strength": self.strength,
+          "speed": self.speed,
+          "gold": self.gold,
+          "bodywear": self.bodywear,
+          "footwear": self.footwear,
+          "inventory": self.inventory,
+          "abilities": self.abilities,
+          "status": self.status,
+          "has_mined": self.has_mined,
+          "last_errors": self.last_errors,
+          "last_messages": self.last_messages,
+          "current_world": self.current_world.name,
+          "current_room": self.current_room,
+          "shop_room": self.shop_room,
+          "mining_room": self.mining_room,
+          "is_renamed": self.is_renamed,
+          "unvisited_main": self.unvisited_main,
+          "unvisited_dark": self.unvisited_dark
         }
+        return str(result)
     def cooldown(self):
         seconds_left = lambda: self.cooldown_end - time()
         if seconds_left() < 0:
@@ -56,10 +85,14 @@ class Player:
     
     def cache_player(self):
         player_file = "data/player.txt"
-        # file_io.write(player_file, self.rooms)
-    def add_room_to_visited(self, room):
+        print(str(self))
+        data = literal_eval(str(self))
+        with open(player_file,'w') as f:
+            pprint(data, stream=f)
+    def add_room_to_visited(self, room, world):
+        world = self.current_room
         room_coords = room.get_coords()
-        self.visited_rooms[room_coords] = {
+        world.rooms[room_coords] = {
           "id": room.id
         }
         dirs = ['n', 's', 'e', 'w']
@@ -78,7 +111,7 @@ class Player:
         if next_room is not None:
             self.current_room = next_room
             if self.current_room.get_coords() not in self.visited_rooms:
-                self.add_room_to_visited(self.current_room)
+                self.add_room_to_visited(self.current_room, self.current_world)
         else:
             print(f"You cannot move {direction} from room {self.current_room.id}.")
 

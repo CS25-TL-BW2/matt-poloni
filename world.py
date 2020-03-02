@@ -7,7 +7,9 @@ from room import Room
 import file_io
 
 class World:
-    def __init__(self, map_file):
+    def __init__(self, name, map_file, num_rooms=500):
+        self.name = name
+        self.num_rooms = num_rooms
         self.rooms = {}
         self.room_grid = []
         self.grid_size = 0
@@ -44,15 +46,15 @@ class World:
                 if dir_exit in self.rooms:
                     dict_room.connect_rooms(direction, self.rooms[dir_exit])
 
-    def add_room(self, room):
-        pass
-        # self.rooms(x, y, desc)
+    def add_room(self, room_desc):
+        print(room_desc)
+        # coords = room_desc["coordinates"]
+        # self.rooms[coords] = 
         # rooms_copy = deepcopy(self.rooms)
         # self.load_graph(rooms_copy)
         # self.cache_graph(rooms_copy)
 
     def cache_graph(self):
-        print(self.rooms)
         map_file = "data/main_world.txt"
         with open(map_file,'w') as f:
             pprint(self.rooms, stream=f)
