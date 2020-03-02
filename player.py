@@ -45,7 +45,7 @@ class Player:
         # -------
         # self.current_room = current_room
         # self.num_rooms = 500
-        # self.visited_rooms = {}
+        # self.current_world = {}
         # self.add_room_to_visited(current_room)
 
         # self.cooldown_end = time()
@@ -99,18 +99,18 @@ class Player:
         for direction in dirs:
             dir_room = getattr(room, f"{direction}_to")
             dir_coords = None if dir_room is None else dir_room.get_coords()
-            self.visited_rooms[room_coords][direction] = dir_coords
-            if dir_room is not None and dir_coords not in self.visited_rooms:
-                self.unvisited_coords.add(dir_coords)
-        self.unvisited_coords.discard(room_coords)
-        # print("UNVISITED", self.unvisited_coords)
-        # print("VISITED", self.visited_rooms.keys())
+            self.current_world[room_coords][direction] = dir_coords
+            if dir_room is not None and dir_coords not in self.current_world:
+                self.current_unvisited.add(dir_coords)
+        self.current_unvisited.discard(room_coords)
+        # print("UNVISITED", self.current_unvisited)
+        # print("VISITED", self.current_world.keys())
     
     def travel(self, direction):
         next_room = self.current_room.get_room_in_direction(direction)
         if next_room is not None:
             self.current_room = next_room
-            if self.current_room.get_coords() not in self.visited_rooms:
+            if self.current_room.get_coords() not in self.current_world:
                 self.add_room_to_visited(self.current_room, self.current_world)
         else:
             print(f"You cannot move {direction} from room {self.current_room.id}.")
@@ -121,7 +121,7 @@ class Player:
 
     def traverse(self):
         traversal_path = []
-        while len(self.visited_rooms) < self.num_rooms:
+        while len(self.current_world) < self.num_rooms:
             x, y = self.current_room.get_coords()
             exits = self.current_room.get_exits()
 
@@ -138,7 +138,7 @@ class Player:
             unvisited_neighbor = False
             for direction in exits:
                 dir_coords = getattr(self.current_room, f"{direction}_to").get_coords()
-                if dir_coords in self.unvisited_coords:
+                if dir_coords in self.current_unvisited:
                     self.travel(direction)
                     traversal_path.append(direction)
                     unvisited_neighbor = True
@@ -156,15 +156,15 @@ class Player:
     
     def bfs_to_targets(self, targets=None):
         if targets is None:
-            targets = self.unvisited_coords
+            targets = self.current_unvisited
         queue = deque()
         current_coords = self.current_room.get_coords()
         queue.append((current_coords, []))
         visited = set()
         while len(queue) > 0:
             room_coords, path = queue.popleft()
-            if room_coords in self.visited_rooms and room_coords not in visited:
-                room = self.visited_rooms[room_coords]
+            if room_coords in self.current_world and room_coords not in visited:
+                room = self.current_world[room_coords]
                 visited.add(room_coords)
                 dirs = ['n', 's', 'e', 'w']
                 for direction in dirs:
@@ -189,8 +189,8 @@ class Player:
         visited = set()
         while len(queue) > 0:
             room_coords, path = queue.popleft()
-            if room_coords in self.visited_rooms and room_coords not in visited:
-                room = self.visited_rooms[room_coords]
+            if room_coords in self.current_world and room_coords not in visited:
+                room = self.current_world[room_coords]
                 visited.add(room_coords)
                 dirs = ['n', 's', 'e', 'w']
                 for direction in dirs:
