@@ -8,8 +8,9 @@ from player import Player
 from world import World
 import file_io
 
-world = World()
-world.print_rooms()
+main_map_file = "data/main_world.txt"
+main_map = World(main_map_file)
+main_map.print_rooms()
 
 # player_data_file = "data/player.txt"
 # player_data = file_io.read(player_data_file)

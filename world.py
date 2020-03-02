@@ -7,14 +7,13 @@ from room import Room
 import file_io
 
 class World:
-    def __init__(self):
+    def __init__(self, map_file):
         self.rooms = {}
         self.room_grid = []
         self.grid_size = 0
 
-        main_map_file = "data/main_world.txt"
-        main_map = file_io.read(main_map_file)
-        self.load_graph(main_map)
+        dict_map = file_io.read(map_file)
+        self.load_graph(dict_map)
     
     def __repr__(self):
         return str(self.rooms)
