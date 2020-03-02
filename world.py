@@ -2,6 +2,7 @@ import random
 import math
 from pprint import pprint
 from copy import deepcopy
+from ast import literal_eval
 
 from room import Room
 import file_io
@@ -13,14 +14,16 @@ class World:
         self.rooms = {}
         self.room_grid = []
         self.grid_size = 0
+        self.map_file = map_file
 
         dict_map = file_io.read(map_file)
-        self.load_graph(dict_map)
+        self.load_graph()
     
     def __repr__(self):
         return str(self.rooms)
     
-    def load_graph(self, room_graph):
+    def load_graph(self):
+        room_graph = file_io.read(self.map_file)
         grid_size = 1
         for coords in room_graph:
             x = coords[0]
@@ -47,12 +50,11 @@ class World:
                     dict_room.connect_rooms(direction, self.rooms[dir_exit])
 
     def add_room(self, room_desc):
-        print(room_desc)
-        # coords = room_desc["coordinates"]
-        # self.rooms[coords] = 
-        # rooms_copy = deepcopy(self.rooms)
-        # self.load_graph(rooms_copy)
-        # self.cache_graph(rooms_copy)
+        x, y = literal_eval(room_desc["coordinates"])
+        self.rooms[(x, y)] = room_desc
+        self.cache_graph()
+        self.load_graph()
+        self.cache_graph()
 
     def cache_graph(self):
         map_file = "data/main_world.txt"

@@ -1,16 +1,22 @@
 class Room:
-    def __init__(self, x=None, y=None, desc=None):
+    def __init__(self, x, y, desc=None):
         self.x = x
         self.y = y
-        self.room_id = None if "room_id" not in desc else desc["room_id"]
-        self.title = None if "title" not in desc else desc["title"]
-        self.description = None if "description" not in desc else desc["description"]
-        self.elevation = None if "elevation" not in desc else desc["elevation"]
-        self.terrain = None if "terrain" not in desc else desc["terrain"]
+        if x == 60 and y == 59: print(desc)
+
+        prop_check = lambda n, v=None: v if n not in desc else desc[n]
+
+        self.room_id = prop_check("room_id")
+        self.title = prop_check("title")
+        self.description = prop_check("description")
+        self.elevation = prop_check("elevation")
+        self.terrain = prop_check("terrain")
+
         self.n = None
         self.s = None
         self.e = None
         self.w = None
+
     def __repr__(self):
         dirs = ['n', 's', 'e', 'w']
         result = {

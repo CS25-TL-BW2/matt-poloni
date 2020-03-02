@@ -46,7 +46,7 @@ class Player:
         # self.current_room = current_room
         # self.num_rooms = 500
         # self.current_world = {}
-        # self.add_room_to_visited(current_room)
+        # self.visit_room(current_room)
 
         # self.cooldown_end = time()
     
@@ -85,24 +85,22 @@ class Player:
     
     def cache_player(self):
         player_file = "data/player.txt"
-        print(str(self))
+        # print(str(self))
         data = literal_eval(str(self))
         with open(player_file,'w') as f:
             pprint(data, stream=f)
-    def add_room_to_visited(self, room, world):
-        world = self.current_room
-        room_coords = room.get_coords()
-        world.rooms[room_coords] = {
-          "id": room.id
-        }
-        dirs = ['n', 's', 'e', 'w']
-        for direction in dirs:
-            dir_room = getattr(room, f"{direction}_to")
-            dir_coords = None if dir_room is None else dir_room.get_coords()
-            self.current_world[room_coords][direction] = dir_coords
-            if dir_room is not None and dir_coords not in self.current_world:
-                self.current_unvisited.add(dir_coords)
-        self.current_unvisited.discard(room_coords)
+    def visit_room(self, room):
+        world = self.current_world
+        # room_coords = room.get_coords()
+        world.add_room(room)
+        # dirs = ['n', 's', 'e', 'w']
+        # for direction in dirs:
+        #     dir_room = getattr(room, f"{direction}_to")
+        #     dir_coords = None if dir_room is None else dir_room.get_coords()
+        #     self.current_world[room_coords][direction] = dir_coords
+        #     if dir_room is not None and dir_coords not in self.current_world:
+        #         self.current_unvisited.add(dir_coords)
+        # self.current_unvisited.discard(room_coords)
         # print("UNVISITED", self.current_unvisited)
         # print("VISITED", self.current_world.keys())
     
@@ -111,7 +109,7 @@ class Player:
         if next_room is not None:
             self.current_room = next_room
             if self.current_room.get_coords() not in self.current_world:
-                self.add_room_to_visited(self.current_room, self.current_world)
+                self.visit_room(self.current_room, self.current_world)
         else:
             print(f"You cannot move {direction} from room {self.current_room.id}.")
 

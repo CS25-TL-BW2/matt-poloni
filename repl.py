@@ -16,6 +16,10 @@ player_data_file = "data/player.txt"
 player_data = file_io.read(player_data_file)
 player = Player(player_data)
 player.cache_player()
+data4 = {"room_id": 2,"title": "A misty room","description": "You are standing on grass and surrounded by a dense mist. You can barely make out the exits in any direction.","coordinates": "(60,59)","elevation": 0,"terrain": "NORMAL",
+  "exits": {"n": (60, 60),"s": (60, 58),"e": (61, 59)}}
+player.visit_room(data4)
+player.current_world.print_rooms()
 
 if __name__ == '__main__':
     pass
