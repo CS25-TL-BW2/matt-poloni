@@ -3,7 +3,7 @@ class Room:
         self.x = x
         self.y = y
         self.room_id = None if "room_id" not in desc else desc["room_id"]
-        self.title = None if "title" not in desc else desc["room_id"]
+        self.title = None if "title" not in desc else desc["title"]
         self.description = None if "description" not in desc else desc["description"]
         self.elevation = None if "elevation" not in desc else desc["elevation"]
         self.terrain = None if "terrain" not in desc else desc["terrain"]
@@ -13,7 +13,7 @@ class Room:
         self.w = None
     def __repr__(self):
         dirs = ['n', 's', 'e', 'w']
-        return {
+        result = {
             "title": self.title,
             "description": self.description,
             "coordinates": self.get_coords(),
@@ -21,6 +21,7 @@ class Room:
             "elevation": self.elevation,
             "terrain": self.terrain
         }
+        return str(result)
     def get_coords(self):
         return (self.x, self.y)
     def get_exits(self):

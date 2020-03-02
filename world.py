@@ -1,5 +1,6 @@
 import random
 import math
+from pprint import pprint
 from copy import deepcopy
 
 from room import Room
@@ -12,7 +13,7 @@ class World:
         self.grid_size = 0
     
     def __repr__(self):
-        return self.rooms
+        return str(self.rooms)
     
     def load_graph(self, room_graph):
         grid_size = 1
@@ -34,7 +35,7 @@ class World:
             dict_room = self.rooms[coords]
             self.room_grid[x][y] = dict_room
             room = room_graph[coords]
-            print(room["exits"])
+            # print(room["exits"])
             for direction in room["exits"]:
                 dir_exit = room["exits"][direction]
                 if dir_exit in self.rooms:
@@ -42,12 +43,16 @@ class World:
 
     def add_room(self, room):
         pass
-        # Logic specific to adding a room
-        # self.load_graph(deepcopy(self.rooms))
+        # self.rooms(x, y, desc)
+        # rooms_copy = deepcopy(self.rooms)
+        # self.load_graph(rooms_copy)
+        # self.cache_graph(rooms_copy)
 
     def cache_graph(self):
+        print(self.rooms)
         map_file = "data/main_world.txt"
-        file_io.write(map_file, self.rooms)
+        with open(map_file,'w') as f:
+            pprint(self.rooms, stream=f)
 
     
     def print_rooms(self):
