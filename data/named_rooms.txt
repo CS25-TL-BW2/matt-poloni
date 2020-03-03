@@ -309,7 +309,7 @@
   'dirs': ['n', 's', 'e', 'w'],
   'elevation': 3,
   'exits': {'e': (62, 57), 'n': (61, 58), 's': (61, 56), 'w': (60, 57)},
-  'items': ['shiny treasure'],
+  'items': [],
   'messages': ['You have walked west.',
                'Uphill Penalty: 5s CD',
                'Wise Explorer: -50% CD'],

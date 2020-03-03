@@ -1,7 +1,9 @@
+from timeit import default_timer as timer
 from time import time
 from datetime import datetime
 from pprint import pprint
 from ast import literal_eval
+import hashlib
 import random
 
 from world import World
@@ -20,7 +22,11 @@ class Player:
         self.pirate_room = prop_check("pirate_room")
         self.well_room = prop_check("well_room")
         self.cooldown_end = prop_check("cooldown_end")
-        self.ideal_name = "matt-poloni"
+
+        # Last Proof Endpoint
+        bc = self.cooldown(bc_last_proof)
+        self.bc_diff = prop_check("difficulty", c=bc)
+        self.bc_proof = prop_check("proof", c=bc)
         
         # Map Caches
         main_world_file = "data/main_world.txt"
@@ -73,7 +79,9 @@ class Player:
           "shop_room": self.shop_room,
           "mining_room": self.mining_room,
           "pirate_room": self.pirate_room,
-          "well_room": self.well_room
+          "well_room": self.well_room,
+          "bc_diff": self.bc_diff,
+          "bc_proof": self.bc_proof
         }
         return str(result)
     
@@ -215,5 +223,25 @@ class Player:
             dirs = self.current_room.dirs
             rand_dir = random.choice(dirs)
             self.travel(rand_dir)
-        # 
-        # If name != ideal name, go get it changed
+
+    def proof_of_work(last_proof):
+        print("Searching for next proof")
+        encoded = str(last_proof).encode()
+        last_hash = hashlib.sha256(encoded).hexdigest()
+        base = 0
+        prove = lambda b: random.randrange(b, b + (16**6))
+        start = timer()
+        while valid_proof(last_hash, (proof := prove(base))) is False:
+          if timer() - start > 3:
+              print("Taking more than 3 seconds, trying again")
+              return None
+          base += 1
+
+        print("Proof found: " + str(proof) + " in " + str(timer() - start))
+        return proof
+
+
+    def valid_proof(last_proof, new_proof):
+        guess = f"{last_proof}{new_proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return last_proof[-6:] == guess_hash[:6]
