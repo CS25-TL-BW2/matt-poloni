@@ -75,6 +75,18 @@ class Player:
         data = literal_eval(str(self))
         with open(player_file,'w') as f:
             pprint(data, stream=f)
+        
+        pprint(data)
+        world = self.current_world
+        print(f"TRAVERSAL: {len(world.rooms)}/{world.num_rooms}")
+        print(f"COORDS: {self.current_room.get_coords()}")
+        print(f"ERRORS ({len(self.errors)})")
+        for error in self.errors:
+            print("- ", error)
+        print(f"MESSAGES ({len(self.messages)})")
+        for message in self.messages:
+            print("- ", message)
+        print("--------------------")
 
     def cooldown(self, fn=None):
         seconds_left = lambda: self.cooldown_end - time()

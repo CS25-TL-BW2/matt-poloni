@@ -15,9 +15,10 @@ player.cache_player()
 player.traverse()
 
 if __name__ == '__main__':
-    print(f"ERRORS ({len(player.errors)})")
-    for error in player.errors:
-        print(error)
-    print(f"MESSAGES ({len(player.messages)})")
-    for message in player.messages:
-        print(message)
+    pass
+    # print(f"ERRORS ({len(player.errors)})")
+    # for error in player.errors:
+    #     print(error)
+    # print(f"MESSAGES ({len(player.messages)})")
+    # for message in player.messages:
+    #     print(message)
