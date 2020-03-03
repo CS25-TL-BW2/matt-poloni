@@ -14,8 +14,10 @@ class Player:
         # Player Cache
         self.shop_room = prop_check("shop_room")
         self.mining_room = prop_check("mining_room")
-        self.is_renamed = prop_check("is_renamed")
+        self.pirate_room = prop_check("pirate_room")
+        self.well_room = prop_check("well_room")
         self.cooldown_end = prop_check("cooldown_end")
+        self.ideal_name = "matt-poloni"
         
         # Map Caches
         main_world_file = "data/main_world.txt"
@@ -67,7 +69,8 @@ class Player:
           "current_room": self.current_room.get_coords(),
           "shop_room": self.shop_room,
           "mining_room": self.mining_room,
-          "is_renamed": self.is_renamed
+          "pirate_room": self.pirate_room,
+          "well_room": self.well_room
         }
         return str(result)
     
