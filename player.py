@@ -76,7 +76,6 @@ class Player:
         return str(result)
 
     def cooldown(self):
-        print(self.cooldown_end, time())
         seconds_left = lambda: self.cooldown_end - time()
         if seconds_left() > 0:
             print(f"Waiting for cooldown period to end in {int(seconds_left())} seconds.")
@@ -119,18 +118,21 @@ class Player:
     
     def travel(self, direction):
         self.cooldown()
+        before = self.current_room.get_coords()
         room_response = adv_move(direction)
         self.cooldown_end = time() + room_response["cooldown"]
-        self.cache_player()
         coords = room_response["coordinates"]
+        self.last_errors = room_response["errors"]
+        self.last_messages = room_response["messages"]
+        self.cache_player()
 
-        if room_response is not None:
+        if room_response is not None and before != coords:
             self.visit_room(room_response)
             next_room = self.current_world.rooms[coords]
             self.current_room = next_room
             self.cache_player()
         else:
-            print(f"You cannot move {direction} from room {self.current_room.room_id}.")
+            print(f"You cannot move {direction} from room {coords}.")
 
     def travel_route(self, route):
         for direction in route:
@@ -140,22 +142,11 @@ class Player:
         traversal_path = []
         world = self.current_world
         while len(world.rooms) < world.num_rooms:
-            x, y = self.current_room.get_coords()
-            exits = self.current_room.get_exits()
-
-            # Grab exits
-            # Grab four nearest unvisited
-            # Compare each exit's shortest distance to unvisited
-            
-            def min_dist(direction):
-                vx, vy = getattr(self.current_room, f"{direction}_to").get_coords()
-                return abs(x-vx) + abs(y-vy)
-            
-            exits = sorted(exits, key=min_dist)
-            # print(exits)
+            dirs = self.current_room.dirs
+            print(dirs)
             unvisited_neighbor = False
-            for direction in exits:
-                dir_coords = getattr(self.current_room, f"{direction}_to").get_coords()
+            for direction in dirs:
+                dir_coords = self.current_room.exit_coords(direction)
                 if dir_coords in self.current_unvisited:
                     self.travel(direction)
                     traversal_path.append(direction)
@@ -181,14 +172,14 @@ class Player:
         visited = set()
         while len(queue) > 0:
             room_coords, path = queue.popleft()
-            if room_coords in self.current_world and room_coords not in visited:
-                room = self.current_world[room_coords]
+            if room_coords in self.current_world.rooms and room_coords not in visited:
+                room = self.current_world.rooms[room_coords]
                 visited.add(room_coords)
                 dirs = ['n', 's', 'e', 'w']
                 for direction in dirs:
                     new_path = list(path)
                     new_path.append(direction)
-                    next_coords = room[direction]
+                    next_coords = room.exit_coords(direction)
                     if next_coords in targets:
                         return new_path
                     else:

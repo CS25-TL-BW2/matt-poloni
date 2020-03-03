@@ -50,12 +50,15 @@ class World:
                     dict_room.connect_rooms(direction, self.rooms[dir_exit])
 
     def add_room(self, room_desc):
-        print(room_desc)
+        # print(room_desc)
         x, y = room_desc["coordinates"]
         self.rooms[(x, y)] = room_desc
         self.cache_graph()
         self.load_graph()
         self.cache_graph()
+
+    def room_by_coords(self, coords):
+        return self.rooms[coords]
 
     def cache_graph(self):
         map_file = "data/main_world.txt"

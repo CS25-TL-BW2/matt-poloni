@@ -2,7 +2,6 @@ class Room:
     def __init__(self, x, y, desc=None):
         self.x = x
         self.y = y
-        if x == 60 and y == 59: print(desc)
 
         prop_check = lambda n, v=None: v if n not in desc else desc[n]
 
@@ -12,6 +11,7 @@ class Room:
         self.elevation = prop_check("elevation")
         self.terrain = prop_check("terrain")
 
+        self.dirs = list(prop_check("exits", {}).keys())
         self.n = None
         self.s = None
         self.e = None
@@ -24,6 +24,7 @@ class Room:
             "title": self.title,
             "description": self.description,
             "coordinates": self.get_coords(),
+            "dirs": self.dirs,
             "exits": self.get_exits(),
             "elevation": self.elevation,
             "terrain": self.terrain
@@ -37,6 +38,16 @@ class Room:
         return exits
     def get_exits_string(self):
         return f"Exits: [{', '.join(self.get_exits().keys())}]"
+    def exit_coords(self, direction):
+        dirs_math = {
+            'n': (0, 1),
+            's': (0, -1),
+            'e': (1, 0),
+            'w': (-1, 0)
+        }
+        exit_x = dirs_math[direction][0]
+        exit_y = dirs_math[direction][1]
+        return (self.x + exit_x, self.y + exit_y)
     def get_direction(self, direction):
         return getattr(self, direction)
     def connect_rooms(self, direction, connecting_room):
