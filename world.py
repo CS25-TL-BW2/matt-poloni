@@ -68,6 +68,7 @@ class World:
             if dir_coords not in self.rooms:
                 self.unvisited.add(dir_coords)
         self.cache_graph()
+        # self.print_rooms()
     
     def room_by_coords(self, coords):
         return self.rooms[coords]

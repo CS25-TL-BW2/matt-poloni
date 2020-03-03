@@ -1,4 +1,5 @@
 from time import time
+from datetime import datetime
 from pprint import pprint
 from ast import literal_eval
 
@@ -91,7 +92,7 @@ class Player:
     def cooldown(self, fn=None):
         seconds_left = lambda: self.cooldown_end - time()
         if seconds_left() > 0:
-            print(f"Waiting for cooldown period to end in {int(seconds_left())} seconds.")
+            print(f"{datetime.now()} -> Waiting for cooldown period to end in {int(seconds_left())} seconds.")
         while seconds_left() > 0:
             pass
         
@@ -131,7 +132,6 @@ class Player:
         coords = room_response["coordinates"]
         self.errors = room_response["errors"]
         self.messages = room_response["messages"]
-        self.cache_player()
 
         if room_response is not None and before != coords:
             self.visit_room(room_response)
@@ -140,6 +140,7 @@ class Player:
             self.cache_player()
             return True
         else:
+            self.cache_player()
             print(f"You cannot move {direction} from {coords}.")
             return False
 
@@ -167,4 +168,5 @@ class Player:
                 self.travel_route(new_route)
                 traversal_path.extend(new_route)
         
+        print(f"{datetime.now()} -> All {self.current_world.num_rooms} have been visited.")
         return traversal_path
