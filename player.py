@@ -135,9 +135,9 @@ class Player:
         coords = room_response["coordinates"]
         self.errors = room_response["errors"]
         self.messages = room_response["messages"]
+        self.visit_room(room_response)
 
         if room_response is not None and before != coords:
-            self.visit_room(room_response)
             next_room = self.current_world.rooms[coords]
             self.current_room = next_room
             self.cache_player()
@@ -153,14 +153,15 @@ class Player:
                 print(f"Something's wrong with this route: {route}")
                 break
 
-    def traverse(self):
+    def traverse(self, visit_known=False):
         traversal_path = []
         world = self.current_world
+        unvisited = set() if visit_known else self.current_world.unvisited
         while len(world.rooms) < world.num_rooms:
             dirs = self.current_room.dirs
             for direction in dirs:
                 dir_coords = self.current_room.exit_coords(direction)
-                if dir_coords in self.current_world.unvisited:
+                if dir_coords in unvisited:
                     self.travel(direction)
                     traversal_path.append(direction)
                     break
@@ -173,3 +174,6 @@ class Player:
         
         print(f"{datetime.now()} -> All {self.current_world.num_rooms} have been visited.")
         return traversal_path
+
+    def take(self, item_name):
+        self.cooldown()

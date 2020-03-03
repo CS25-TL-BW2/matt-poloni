@@ -1,6 +1,6 @@
 {'abilities': [],
  'bodywear': None,
- 'cooldown_end': 1583248020.7072327,
+ 'cooldown_end': 1583253812.7432342,
  'current_room': (50, 55),
  'current_world': 'main',
  'encumbrance': 0,
