@@ -1,6 +1,7 @@
 import requests
 from decouple import config
 from ast import literal_eval
+from time import time
 
 API_KEY = config('API_KEY')
 BACKEND = config('BACKEND')
@@ -14,12 +15,14 @@ def check_json(response):
             data["coordinates"] = literal_eval(data["coordinates"])
         if "exits" in data:
             data["dirs"] = data["exits"]
+        if "cooldown" in data:
+            data["cooldown_end"] = time() + data["cooldown"]
         return data
     except ValueError:
         print("Error: Non-JSON response")
         print("Response returned:")
-        print(response)
-        return None
+        print(response.status_code, response.reason, response.elapsed)
+        return {"cooldown_end": time() + 60}
 
 
 #==========================================
@@ -58,6 +61,7 @@ def adv_status():
 
     r = requests.post(endpoint, headers=headers)
     data = check_json(r)
+    print('STATUS', data)
 
     return data
 
@@ -99,8 +103,9 @@ def adv_move(direction, next_room_id=None):
     endpoint = req_adv("move/")
     payload = { "direction": direction }
     if next_room_id is not None:
-        payload["next_room_id"] = str(next_room_id)
+        payload["next_room_id"] = next_room_id
     
+    print('ADV_MOVE',payload)
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
 

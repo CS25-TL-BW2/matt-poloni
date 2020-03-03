@@ -8,10 +8,18 @@ from player import Player
 from world import World
 import file_io
 
-player_data_file = "data/player.txt"
-player_data = file_io.read(player_data_file)
-player = Player(player_data)
+player = Player()
 player.cache_player()
 
 # Current actions
 world = player.current_world
+coords = player.current_room.get_coords()
+# target = player.shop_room
+# target = player.pirate_room
+target = player.well_room
+path = world.bfs_to_targets(coords, {target})
+player.travel_route(path)
+print("DONE")
+# world.print_rooms()
+# player.treasure_hunt()
+# path = world.bfs_to_targets({})

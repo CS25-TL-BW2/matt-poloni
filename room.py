@@ -1,3 +1,5 @@
+from ast import literal_eval
+
 class Room:
     def __init__(self, x, y, desc=None):
         self.x = x
@@ -10,6 +12,8 @@ class Room:
         self.description = prop_check("description")
         self.elevation = prop_check("elevation")
         self.terrain = prop_check("terrain")
+        self.items = prop_check("items", [])
+        self.messages = prop_check("messages", [])
 
         self.dirs = prop_check("dirs", [])
         self.n = None
@@ -26,9 +30,13 @@ class Room:
             "dirs": self.dirs,
             "exits": self.get_exits(),
             "elevation": self.elevation,
-            "terrain": self.terrain
+            "terrain": self.terrain,
+            "items": self.items,
+            "messages": self.messages
         }
         return str(result)
+    def get_props(self):
+        return literal_eval(str(self))
     def get_coords(self):
         return (self.x, self.y)
     def get_exits(self):

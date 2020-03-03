@@ -19,6 +19,8 @@ class World:
 
         self.map_file = map_file
         self.load_graph()
+        self.cache_graph()
+        file_io.parse_named()
     
     def __repr__(self):
         return str([self.unvisited, self.rooms])
@@ -26,6 +28,8 @@ class World:
     def cache_graph(self):
         with open(self.map_file,'w') as f:
             pprint([self.unvisited, self.rooms], stream=f)
+
+        file_io.parse_named()
     
     def load_graph(self):
         unvisited, room_graph = file_io.read(self.map_file)
@@ -55,6 +59,7 @@ class World:
                     dict_room.connect_rooms(direction, self.rooms[dir_coords])
 
     def add_room(self, room_desc):
+        # print('ADD_ROOM', room_desc)
         coords = room_desc["coordinates"]
         self.unvisited.discard(coords)
         self.rooms[coords] = room_desc
