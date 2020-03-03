@@ -311,9 +311,7 @@
   'terrain': 'NORMAL',
   'title': 'Wishing Well'},
  {'coordinates': (68, 47),
-  'description': 'You see a sign before you that reads:\n\n'You have found Pirate Ry's. Send a `change_name` request "
-                 "and I'll change your identity to whatever you wish... for a "
-                 "price.'",
+  'description': 'You see a sign before you that reads:\n\n'You have found Pirate Ry's. Send a `change_name` request and I'll change your identity to whatever you wish... for a price.'",
   'dirs': ['n'],
   'elevation': 0,
   'exits': {'n': (68, 48)},
