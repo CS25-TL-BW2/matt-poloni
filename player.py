@@ -157,7 +157,8 @@ class Player:
         traversal_path = []
         world = self.current_world
         unvisited = set() if visit_known else self.current_world.unvisited
-        while len(world.rooms) < world.num_rooms:
+        visited = {} if visit_known else world.rooms
+        while len(visited) < world.num_rooms:
             dirs = self.current_room.dirs
             for direction in dirs:
                 dir_coords = self.current_room.exit_coords(direction)

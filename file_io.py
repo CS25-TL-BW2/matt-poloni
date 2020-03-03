@@ -12,12 +12,12 @@ def read(target_file):
 
 def write(target_file, data):
     with open(target_file, 'w') as file:
-        file.write(str(data))
+        pprint(data, stream=file)
 
 def parse_named():
     read_file = "data/main_world.txt"
     write_file = "data/named_rooms.txt"
-    
+
     with open(read_file, 'r') as file:
         result = file.read()
     result = literal_eval(result)
@@ -37,4 +37,4 @@ def parse_named():
             named.append(desc)
 
     with open(write_file, 'w') as file:
-        file.write(str(named))
+        pprint(named, stream=file)

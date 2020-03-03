@@ -12,13 +12,6 @@ player_data_file = "data/player.txt"
 player_data = file_io.read(player_data_file)
 player = Player(player_data)
 player.cache_player()
-world = player.current_world
 
-if __name__ == '__main__':
-    pass
-    # print(f"ERRORS ({len(player.errors)})")
-    # for error in player.errors:
-    #     print(error)
-    # print(f"MESSAGES ({len(player.messages)})")
-    # for message in player.messages:
-    #     print(message)
+# Current actions
+world = player.current_world
