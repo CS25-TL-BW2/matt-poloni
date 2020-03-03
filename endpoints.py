@@ -1,5 +1,6 @@
 import requests
 from decouple import config
+from ast import literal_eval
 
 API_KEY = config('API_KEY')
 BACKEND = config('BACKEND')
@@ -8,7 +9,10 @@ headers = { "Authorization": f"Token {API_KEY}" }
 
 def check_json(response):
     try:
-        return response.json()
+        data = response.json()
+        if "coordinates" in data:
+            data["coordinates"] = literal_eval(data["coordinates"])
+        return data
     except ValueError:
         print("Error: Non-JSON response")
         print("Response returned:")
@@ -96,7 +100,9 @@ def adv_move(direction, next_room_id=None):
         payload["next_room_id"] = str(next_room_id)
     
     r = requests.post(endpoint, headers=headers, json=payload)
+    print(r)
     data = check_json(r)
+    print(data)
 
     return data
 
