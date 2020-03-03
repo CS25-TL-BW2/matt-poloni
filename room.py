@@ -1,5 +1,6 @@
 class Room:
     def __init__(self, x, y, desc=None):
+        # print("ROOM_INIT", desc)
         self.x = x
         self.y = y
 
@@ -11,14 +12,13 @@ class Room:
         self.elevation = prop_check("elevation")
         self.terrain = prop_check("terrain")
 
-        self.dirs = list(prop_check("exits", {}).keys())
+        self.dirs = prop_check("dirs", [])
         self.n = None
         self.s = None
         self.e = None
         self.w = None
 
     def __repr__(self):
-        dirs = ['n', 's', 'e', 'w']
         result = {
             "room_id": self.room_id,
             "title": self.title,

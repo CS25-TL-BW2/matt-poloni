@@ -12,6 +12,8 @@ def check_json(response):
         data = response.json()
         if "coordinates" in data:
             data["coordinates"] = literal_eval(data["coordinates"])
+        if "exits" in data:
+            data["dirs"] = data["exits"]
         return data
     except ValueError:
         print("Error: Non-JSON response")
@@ -100,8 +102,8 @@ def adv_move(direction, next_room_id=None):
         payload["next_room_id"] = str(next_room_id)
     
     r = requests.post(endpoint, headers=headers, json=payload)
-    print(r)
     data = check_json(r)
+    # print(r, data)
 
     return data
 

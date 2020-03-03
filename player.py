@@ -1,6 +1,5 @@
 from time import time
 from pprint import pprint
-from collections import deque
 from ast import literal_eval
 
 from world import World
@@ -11,43 +10,41 @@ class Player:
     def __init__(self, cache="data/player.txt"):
         prop_check = lambda n, v=None, c=cache: v if n not in c else c[n]
 
-        main_world_file = "data/main_world.txt"
-        self.main_world = World("main", main_world_file)
-        self.unvisited_main = prop_check("unvisited_main")
-
-        dark_world_file = "data/dark_world.txt"
-        self.dark_world = World("dark", dark_world_file)
-        self.unvisited_dark = prop_check("unvisited_dark")
-
-        self.name = prop_check("name")
-        self.cooldown_end = prop_check("cooldown_end")
-        self.encumbrance = prop_check("encumbrance")
-        self.strength = prop_check("strength")
-        self.speed = prop_check("speed")
-        self.gold = prop_check("gold")
-        self.bodywear = prop_check("bodywear")
-        self.footwear = prop_check("footwear")
-        self.inventory = prop_check("inventory")
-        self.abilities = prop_check("abilities")
-        self.status = prop_check("status")
-        self.has_mined = prop_check("has_mined")
-        self.last_errors = prop_check("last_errors")
-        self.last_messages = prop_check("last_messages")
-
-        self.current_world = self.dark_world if prop_check("current_world") == "dark" else self.main_world
-        current_coords = prop_check("current_room")
-        self.current_room = self.current_world.rooms[current_coords]
-        self.current_unvisited = self.unvisited_dark if prop_check("current_world") == "dark" else self.unvisited_main
+        # Player Cache
         self.shop_room = prop_check("shop_room")
         self.mining_room = prop_check("mining_room")
         self.is_renamed = prop_check("is_renamed")
-        # -------
-        # self.current_room = current_room
-        # self.num_rooms = 500
-        # self.current_world = {}
-        # self.visit_room(current_room)
+        self.cooldown_end = prop_check("cooldown_end")
+        
+        # Map Caches
+        main_world_file = "data/main_world.txt"
+        self.main_world = World("main", main_world_file)
+        dark_world_file = "data/dark_world.txt"
+        self.dark_world = World("dark", dark_world_file)
+        self.current_world = self.dark_world if prop_check("current_world") == "dark" else self.main_world
 
-        # self.cooldown_end = time()
+        # Status Endpoint
+        status = self.cooldown(lambda: adv_status())
+        self.cooldown_end = time() + status["cooldown"]
+        self.name = prop_check("name", status)
+        self.encumbrance = prop_check("encumbrance", status)
+        self.strength = prop_check("strength", status)
+        self.speed = prop_check("speed", status)
+        self.gold = prop_check("gold", status)
+        self.bodywear = prop_check("bodywear", status)
+        self.footwear = prop_check("footwear", status)
+        self.inventory = prop_check("inventory", status)
+        self.abilities = prop_check("abilities", status)
+        self.status = prop_check("status", status)
+        self.has_mined = prop_check("has_mined", status)
+        
+        # Init Endpoint
+        init = self.cooldown(lambda: adv_init())
+        self.cooldown_end = time() + init["cooldown"]
+        current_coords = prop_check("current_room", init)
+        self.current_room = self.current_world.rooms[current_coords]
+        self.errors = prop_check("errors", init)
+        self.messages = prop_check("messages", init)
     
     def __repr__(self):
         result = {
@@ -63,25 +60,15 @@ class Player:
           "abilities": self.abilities,
           "status": self.status,
           "has_mined": self.has_mined,
-          "last_errors": self.last_errors,
-          "last_messages": self.last_messages,
+          "errors": self.errors,
+          "messages": self.messages,
           "current_world": self.current_world.name,
           "current_room": self.current_room.get_coords(),
           "shop_room": self.shop_room,
           "mining_room": self.mining_room,
-          "is_renamed": self.is_renamed,
-          "unvisited_main": self.unvisited_main,
-          "unvisited_dark": self.unvisited_dark
+          "is_renamed": self.is_renamed
         }
         return str(result)
-
-    def cooldown(self):
-        seconds_left = lambda: self.cooldown_end - time()
-        if seconds_left() > 0:
-            print(f"Waiting for cooldown period to end in {int(seconds_left())} seconds.")
-        while seconds_left() > 0:
-            pass
-        return
     
     def cache_player(self):
         player_file = "data/player.txt"
@@ -89,6 +76,16 @@ class Player:
         data = literal_eval(str(self))
         with open(player_file,'w') as f:
             pprint(data, stream=f)
+
+    def cooldown(self, fn=None):
+        seconds_left = lambda: self.cooldown_end - time()
+        if seconds_left() > 0:
+            print(f"Waiting for cooldown period to end in {int(seconds_left())} seconds.")
+        while seconds_left() > 0:
+            pass
+        
+        if fn is not None:
+            return fn()
 
     def visit_room(self, room):
         world = self.current_world
@@ -108,22 +105,21 @@ class Player:
         for direction in exits:
             new_coords = dir_coords(direction)
             if new_coords not in self.current_world.rooms:
-                self.current_unvisited.add(new_coords)
+                self.current_world.unvisited.add(new_coords)
                 room["exits"][direction] = new_coords
         
-        self.current_unvisited.discard(self.current_room)
+        self.current_world.unvisited.discard(self.current_room)
         world.add_room(room)
         current_room = self.current_world.rooms[(x, y)]
         self.current_room = current_room
     
     def travel(self, direction):
-        self.cooldown()
         before = self.current_room.get_coords()
-        room_response = adv_move(direction)
+        room_response = self.cooldown(lambda: adv_move(direction))
         self.cooldown_end = time() + room_response["cooldown"]
         coords = room_response["coordinates"]
-        self.last_errors = room_response["errors"]
-        self.last_messages = room_response["messages"]
+        self.errors = room_response["errors"]
+        self.messages = room_response["messages"]
         self.cache_player()
 
         if room_response is not None and before != coords:
@@ -131,12 +127,16 @@ class Player:
             next_room = self.current_world.rooms[coords]
             self.current_room = next_room
             self.cache_player()
+            return True
         else:
-            print(f"You cannot move {direction} from room {coords}.")
+            print(f"You cannot move {direction} from {coords}.")
+            return False
 
     def travel_route(self, route):
         for direction in route:
-            self.travel(direction)
+            if not self.travel(direction):
+                print(f"Something's wrong with this route: {route}")
+                break
 
     def traverse(self):
         traversal_path = []
@@ -144,71 +144,17 @@ class Player:
         while len(world.rooms) < world.num_rooms:
             dirs = self.current_room.dirs
             print(dirs)
-            unvisited_neighbor = False
             for direction in dirs:
                 dir_coords = self.current_room.exit_coords(direction)
-                if dir_coords in self.current_unvisited:
+                if dir_coords in self.current_world.unvisited:
                     self.travel(direction)
                     traversal_path.append(direction)
-                    unvisited_neighbor = True
                     break
-            
-            if unvisited_neighbor: continue
-            
-            new_route = self.bfs_to_targets()
-            self.travel_route(new_route)
-            traversal_path.extend(new_route)
+            else:
+                world = self.current_world
+                coords = self.current_room.get_coords()
+                new_route = world.bfs_to_targets(coords)
+                self.travel_route(new_route)
+                traversal_path.extend(new_route)
         
         return traversal_path
-                    
-
-    
-    def bfs_to_targets(self, targets=None):
-        if targets is None:
-            targets = self.current_unvisited
-        queue = deque()
-        current_coords = self.current_room.get_coords()
-        queue.append((current_coords, []))
-        visited = set()
-        while len(queue) > 0:
-            room_coords, path = queue.popleft()
-            if room_coords in self.current_world.rooms and room_coords not in visited:
-                room = self.current_world.rooms[room_coords]
-                visited.add(room_coords)
-                dirs = ['n', 's', 'e', 'w']
-                for direction in dirs:
-                    new_path = list(path)
-                    new_path.append(direction)
-                    next_coords = room.exit_coords(direction)
-                    if next_coords in targets:
-                        return new_path
-                    else:
-                        queue.append((next_coords, new_path))
-        print(f"A path could not be found from Room {self.current_room.room_id} to an unvisited room.")
-        return None
-    
-    def bfs_to_coords(self, target_coords):
-        current_coords = self.current_room.get_coords()
-        if target_coords == current_coords:
-            print("You are already at those coordinates.")
-            return
-        
-        queue = deque()
-        queue.append((current_coords, []))
-        visited = set()
-        while len(queue) > 0:
-            room_coords, path = queue.popleft()
-            if room_coords in self.current_world.rooms and room_coords not in visited:
-                room = self.current_world[room_coords]
-                visited.add(room_coords)
-                dirs = ['n', 's', 'e', 'w']
-                for direction in dirs:
-                    new_path = list(path)
-                    new_path.append(direction)
-                    next_coords = room[direction]
-                    if next_coords == target_coords:
-                        return new_path
-                    else:
-                        queue.append((next_coords, new_path))
-        print(f"A path could not be found from Room {self.current_room.room_id} to the coordinates {target_coords}.")
-        return None
