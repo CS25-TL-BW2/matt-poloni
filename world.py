@@ -34,7 +34,6 @@ class World:
         for coords in room_graph:
             x = coords[0]
             y = coords[1]
-            print(room_graph[coords])
             self.rooms[coords] = Room(x, y, room_graph[coords])
             grid_size = max(grid_size, x, y)
         
@@ -56,7 +55,6 @@ class World:
                     dict_room.connect_rooms(direction, self.rooms[dir_coords])
 
     def add_room(self, room_desc):
-        # print(room_desc)
         coords = room_desc["coordinates"]
         self.unvisited.discard(coords)
         self.rooms[coords] = room_desc
@@ -85,8 +83,7 @@ class World:
             if room_coords in self.rooms and room_coords not in visited:
                 room = self.rooms[room_coords]
                 visited.add(room_coords)
-                dirs = ['n', 's', 'e', 'w']
-                for direction in dirs:
+                for direction in room.dirs:
                     new_path = list(path)
                     new_path.append(direction)
                     next_coords = room.exit_coords(direction)

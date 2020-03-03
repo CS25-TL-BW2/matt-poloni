@@ -1,6 +1,5 @@
 class Room:
     def __init__(self, x, y, desc=None):
-        # print("ROOM_INIT", desc)
         self.x = x
         self.y = y
 

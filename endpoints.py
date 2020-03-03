@@ -103,7 +103,6 @@ def adv_move(direction, next_room_id=None):
     
     r = requests.post(endpoint, headers=headers, json=payload)
     data = check_json(r)
-    # print(r, data)
 
     return data
 

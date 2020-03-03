@@ -72,7 +72,6 @@ class Player:
     
     def cache_player(self):
         player_file = "data/player.txt"
-        # print(str(self))
         data = literal_eval(str(self))
         with open(player_file,'w') as f:
             pprint(data, stream=f)
@@ -143,7 +142,6 @@ class Player:
         world = self.current_world
         while len(world.rooms) < world.num_rooms:
             dirs = self.current_room.dirs
-            print(dirs)
             for direction in dirs:
                 dir_coords = self.current_room.exit_coords(direction)
                 if dir_coords in self.current_world.unvisited:
