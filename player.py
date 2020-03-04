@@ -224,14 +224,21 @@ class Player:
             rand_dir = random.choice(dirs)
             self.travel(rand_dir)
 
-    def proof_of_work(last_proof):
+    def proof_of_work(self):
+        proof = self.bc_proof
+        bc_response = self.cooldown(bc_last_proof)
+        self.bc_diff = bc_response["difficulty"]
+        self.bc_proof = bc_response["proof"]
+        self.cache_player()
+
         print("Searching for next proof")
-        encoded = str(last_proof).encode()
+        encoded = str(proof).encode()
         last_hash = hashlib.sha256(encoded).hexdigest()
         base = 0
         prove = lambda b: random.randrange(b, b + (16**6))
+
         start = timer()
-        while valid_proof(last_hash, (proof := prove(base))) is False:
+        while self.valid_proof(proof := prove(base)) is False:
           if timer() - start > 3:
               print("Taking more than 3 seconds, trying again")
               return None
@@ -241,7 +248,8 @@ class Player:
         return proof
 
 
-    def valid_proof(last_proof, new_proof):
-        guess = f"{last_proof}{new_proof}".encode()
+    def valid_proof(self, new_proof):
+        proof = self.bc_proof
+        guess = f"{proof}{new_proof}".encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return last_proof[-6:] == guess_hash[:6]
+        return guess_hash[:self.bc_diff] == "0" * self.bc_diff

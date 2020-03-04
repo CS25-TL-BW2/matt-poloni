@@ -2,7 +2,7 @@
 import sys
 import json
 
-from endpoints import adv_move
+from endpoints import adv_move, bc_mine
 from room import Room
 from player import Player
 from world import World
@@ -29,5 +29,7 @@ player.cache_player()
 # path = world.bfs_to_targets({})
 
 # BLOCKCHAIN
-# while True:
-#     pass
+while True:
+    proof = player.proof_of_work()
+    if proof is not None:
+        player.cooldown(lambda: bc_mine(proof))
