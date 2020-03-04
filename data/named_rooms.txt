@@ -238,7 +238,7 @@
   'elevation': 0,
   'exits': {'e': (61, 60), 'n': (60, 61), 's': (60, 59), 'w': (59, 60)},
   'items': [],
-  'messages': ['You have walked north.', 'Wise Explorer: -50% CD'],
+  'messages': ['You have walked south.', 'Wise Explorer: -50% CD'],
   'room_id': 0,
   'terrain': 'NORMAL',
   'title': 'A brightly lit room'},
