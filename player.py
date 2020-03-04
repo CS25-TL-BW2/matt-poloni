@@ -1,23 +1,32 @@
+from timeit import default_timer as timer
 from time import time
 from datetime import datetime
 from pprint import pprint
 from ast import literal_eval
+import hashlib
+import random
 
 from world import World
 from endpoints import *
 import file_io
 
 class Player:
-    def __init__(self, cache="data/player.txt"):
-        prop_check = lambda n, v=None, c=cache: v if n not in c else c[n]
-
+    def __init__(self):
         # Player Cache
+        player_file = "data/player.txt"
+        player = file_io.read(player_file)
+        prop_check = lambda n, v=None, c=player: v if n not in c else c[n]
+
         self.shop_room = prop_check("shop_room")
         self.mining_room = prop_check("mining_room")
         self.pirate_room = prop_check("pirate_room")
         self.well_room = prop_check("well_room")
         self.cooldown_end = prop_check("cooldown_end")
-        self.ideal_name = "matt-poloni"
+
+        # Last Proof Endpoint
+        bc = self.cooldown(bc_last_proof)
+        self.bc_diff = prop_check("difficulty", c=bc)
+        self.bc_proof = prop_check("proof", c=bc)
         
         # Map Caches
         main_world_file = "data/main_world.txt"
@@ -27,27 +36,27 @@ class Player:
         self.current_world = self.dark_world if prop_check("current_world") == "dark" else self.main_world
 
         # Status Endpoint
-        status = self.cooldown(lambda: adv_status())
-        self.cooldown_end = time() + status["cooldown"]
-        self.name = prop_check("name", status)
-        self.encumbrance = prop_check("encumbrance", status)
-        self.strength = prop_check("strength", status)
-        self.speed = prop_check("speed", status)
-        self.gold = prop_check("gold", status)
-        self.bodywear = prop_check("bodywear", status)
-        self.footwear = prop_check("footwear", status)
-        self.inventory = prop_check("inventory", status)
-        self.abilities = prop_check("abilities", status)
-        self.status = prop_check("status", status)
-        self.has_mined = prop_check("has_mined", status)
+        status = self.cooldown(adv_status)
+        self.cooldown_end = status["cooldown_end"]
+        self.name = prop_check("name", c=status)
+        self.encumbrance = prop_check("encumbrance", c= status)
+        self.strength = prop_check("strength", c=status)
+        self.speed = prop_check("speed", c=status)
+        self.gold = prop_check("gold", c=status)
+        self.bodywear = prop_check("bodywear", c=status)
+        self.footwear = prop_check("footwear", c=status)
+        self.inventory = prop_check("inventory", c=status)
+        self.abilities = prop_check("abilities", c=status)
+        self.status = prop_check("status", c=status)
+        self.has_mined = prop_check("has_mined", c=status)
         
         # Init Endpoint
-        init = self.cooldown(lambda: adv_init())
+        init = self.cooldown(adv_init)
         self.cooldown_end = time() + init["cooldown"]
-        current_coords = prop_check("current_room", init)
+        current_coords = prop_check("coordinates", c=init)
         self.current_room = self.current_world.rooms[current_coords]
-        self.errors = prop_check("errors", init)
-        self.messages = prop_check("messages", init)
+        self.errors = prop_check("errors", c=init)
+        self.messages = prop_check("messages", c=init)
     
     def __repr__(self):
         result = {
@@ -70,7 +79,9 @@ class Player:
           "shop_room": self.shop_room,
           "mining_room": self.mining_room,
           "pirate_room": self.pirate_room,
-          "well_room": self.well_room
+          "well_room": self.well_room,
+          "bc_diff": self.bc_diff,
+          "bc_proof": self.bc_proof
         }
         return str(result)
     
@@ -100,7 +111,9 @@ class Player:
             pass
         
         if fn is not None:
-            return fn()
+            response = fn()
+            self.cooldown_end = response["cooldown_end"]
+            return response
 
     def visit_room(self, room):
         world = self.current_world
@@ -129,15 +142,19 @@ class Player:
         self.current_room = current_room
     
     def travel(self, direction):
-        before = self.current_room.get_coords()
-        room_response = self.cooldown(lambda: adv_move(direction))
-        self.cooldown_end = time() + room_response["cooldown"]
+        next_coords = self.current_room.exit_coords(direction)
+        world = self.current_world
+        next_id = None if next_coords not in world.rooms else world.rooms[next_coords].room_id
+
+        room_response = self.cooldown(lambda: adv_move(direction, str(next_id)))
+        print('TRAVEL', room_response)
+        self.cache_player()
         coords = room_response["coordinates"]
         self.errors = room_response["errors"]
         self.messages = room_response["messages"]
+        self.visit_room(room_response)
 
-        if room_response is not None and before != coords:
-            self.visit_room(room_response)
+        if room_response is not None and next_coords == coords:
             next_room = self.current_world.rooms[coords]
             self.current_room = next_room
             self.cache_player()
@@ -146,6 +163,7 @@ class Player:
             self.cache_player()
             print(f"You cannot move {direction} from {coords}.")
             return False
+        
 
     def travel_route(self, route):
         for direction in route:
@@ -153,14 +171,16 @@ class Player:
                 print(f"Something's wrong with this route: {route}")
                 break
 
-    def traverse(self):
+    def traverse(self, visit_known=False):
         traversal_path = []
         world = self.current_world
-        while len(world.rooms) < world.num_rooms:
+        unvisited = set() if visit_known else self.current_world.unvisited
+        visited = {} if visit_known else world.rooms
+        while len(visited) < world.num_rooms:
             dirs = self.current_room.dirs
             for direction in dirs:
                 dir_coords = self.current_room.exit_coords(direction)
-                if dir_coords in self.current_world.unvisited:
+                if dir_coords in unvisited:
                     self.travel(direction)
                     traversal_path.append(direction)
                     break
@@ -173,3 +193,63 @@ class Player:
         
         print(f"{datetime.now()} -> All {self.current_world.num_rooms} have been visited.")
         return traversal_path
+    
+    def take(self, item_name):
+        if self.encumbrance < (self.strength * 0.8):
+            self.cooldown(lambda: adv_take(item_name))
+            
+            status_response = self.cooldown(adv_status)
+            print(status_response)
+            self.inventory = status_response["inventory"]
+            self.errors = status_response["errors"]
+            self.messages = status_response["messages"]
+            self.cache_player()
+
+            init_response = self.cooldown(adv_init)
+            responses = {**status_response, **init_response}
+            self.current_world.add_room(responses)
+            return responses["items"]
+        return None
+
+    def treasure_hunt(self):
+        while self.encumbrance < (self.strength * 0.8):
+            items = self.current_room.items
+            while(len(items) > 0):
+                for item in items:
+                    if "treasure" in item.lower():
+                        items = self.take(item)
+                        break
+
+            dirs = self.current_room.dirs
+            rand_dir = random.choice(dirs)
+            self.travel(rand_dir)
+
+    def proof_of_work(self):
+        proof = self.bc_proof
+        bc_response = self.cooldown(bc_last_proof)
+        self.bc_diff = bc_response["difficulty"]
+        self.bc_proof = bc_response["proof"]
+        self.cache_player()
+
+        print("Searching for next proof")
+        encoded = str(proof).encode()
+        last_hash = hashlib.sha256(encoded).hexdigest()
+        base = 0
+        prove = lambda b: random.randrange(b, b + (16**6))
+
+        start = timer()
+        while self.valid_proof(proof := prove(base)) is False:
+          if timer() - start > 3:
+              print("Taking more than 3 seconds, trying again")
+              return None
+          base += 1
+
+        print("Proof found: " + str(proof) + " in " + str(timer() - start))
+        return proof
+
+
+    def valid_proof(self, new_proof):
+        proof = self.bc_proof
+        guess = f"{proof}{new_proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:self.bc_diff] == "0" * self.bc_diff
